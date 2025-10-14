@@ -5,9 +5,15 @@ from order.entities.order_item import OrderItem
 
 
 class OrderService:
-    def __init__(self, threshold_discount=None, bogo_cosmetics=False):
+    def __init__(
+        self,
+        threshold_discount=None,
+        bogo_cosmetics=False,
+        double_eleven=False,
+    ):
         self.threshold_discount = threshold_discount
         self.bogo_cosmetics = bogo_cosmetics
+        self.double_eleven = double_eleven
 
     def checkout(self, items: List[OrderItem]) -> Order:
         """
@@ -26,9 +32,12 @@ class OrderService:
         order.original_amount = original_amount
 
         # Apply promotions
-        discount = self._apply_threshold_discount(original_amount)
-        order.discount = discount
-        order.total_amount = original_amount - discount
+        double_eleven_discount = self._apply_double_eleven_discount(items)
+        threshold_discount = self._apply_threshold_discount(original_amount)
+        total_discount = double_eleven_discount + threshold_discount
+
+        order.discount = total_discount
+        order.total_amount = original_amount - total_discount
 
         return order
 
@@ -79,3 +88,30 @@ class OrderService:
             return discount_amount
 
         return Decimal("0")
+
+    def _apply_double_eleven_discount(self, items: List[OrderItem]) -> Decimal:
+        """
+        Apply Double Eleven bulk purchase discount.
+
+        For every 10 items of the same product, apply 20% discount to those 10 items.
+        Example: Buy 12 items at 100 each = (10*100*0.8) + (2*100) = 800 + 200 = 1000
+                 Discount = 10*100*0.2 = 200
+        """
+        if not self.double_eleven:
+            return Decimal("0")
+
+        total_discount = Decimal("0")
+
+        for item in items:
+            # Calculate how many complete sets of 10 items
+            sets_of_ten = item.quantity // 10
+
+            if sets_of_ten > 0:
+                # Each set of 10 gets 20% discount
+                discount_per_set = (
+                    item.product.unit_price * 10 * Decimal("0.2")
+                )
+                item_discount = discount_per_set * sets_of_ten
+                total_discount += item_discount
+
+        return total_discount

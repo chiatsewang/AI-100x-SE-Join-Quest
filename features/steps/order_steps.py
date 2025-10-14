@@ -29,6 +29,12 @@ def step_activate_bogo_cosmetics(context):
     context.bogo_cosmetics = True
 
 
+@given("the Double Eleven promotion is active")
+def step_activate_double_eleven(context):
+    """Activate Double Eleven bulk purchase promotion"""
+    context.double_eleven = True
+
+
 @when("a customer places an order with:")
 def step_place_order(context):
     """Place an order with the given items"""
@@ -37,8 +43,11 @@ def step_place_order(context):
     # Create OrderService with promotions if configured
     threshold_discount = getattr(context, "threshold_discount", None)
     bogo_cosmetics = getattr(context, "bogo_cosmetics", False)
+    double_eleven = getattr(context, "double_eleven", False)
     context.order_service = OrderService(
-        threshold_discount=threshold_discount, bogo_cosmetics=bogo_cosmetics
+        threshold_discount=threshold_discount,
+        bogo_cosmetics=bogo_cosmetics,
+        double_eleven=double_eleven,
     )
 
     for row in context.table:
