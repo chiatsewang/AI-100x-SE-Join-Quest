@@ -46,9 +46,23 @@
 
 [→ 查看詳情](benchmarks/order-pricing/README.md)
 
-#### 2. Chinese Chess (規劃中: `benchmarks/chinese-chess/`)
+#### 2. Chinese Chess (`benchmarks/chinese-chess/`)
 
-中國象棋遊戲邏輯實作。
+中國象棋遊戲邏輯實作，完整實現所有棋子規則與勝負判定。
+
+**功能特色**:
+
+- 七種棋子完整規則: 將/帥、士/仕、車、馬/傌、炮、相/象、兵/卒
+- 九宮限制 (General and Guard movement within palace)
+- 河界限制 (Elephant cannot cross river, Soldier behavior changes)
+- 蹩馬腿 (Horse can be blocked)
+- 炮架子 (Cannon must jump one piece to capture)
+- 將帥對臉禁止 (Generals cannot face each other)
+- 勝負判定 (Capturing General wins immediately)
+
+**測試覆蓋**: 1 feature, 22 scenarios, 66 test steps
+
+[→ 查看詳情](benchmarks/chinese-chess/tasks/)
 
 ### 專案結構
 
@@ -61,8 +75,10 @@ bdd-trials/
 │   │   ├── tasks/           # 需求與設計文件
 │   │   └── README.md
 │   │
-│   └── chinese-chess/       # 中國象棋 (待開發)
-│       └── ...
+│   └── chinese-chess/       # 中國象棋
+│       ├── src/             # 原始碼 (entities, pieces, game)
+│       ├── features/        # BDD 測試場景
+│       └── tasks/           # 需求與設計文件 (ERD, OOD)
 │
 ├── requirements.txt         # 共用依賴
 ├── pyproject.toml          # 共用配置
