@@ -1,0 +1,83 @@
+# Task
+請你嚴格遵照「行為驅動開發 (BDD)」的方式，來完成 @chinese-chess.feature 中所有驗收情境的開發。
+不可同時進行 BDD 開發流程中多個步驟也不能略過任何一步驟，必須一步一步扎實執行並確認每一步的結果。
+
+# Context
+
+## Design Guideline
+- 參考 entities ERD: @ERD.md 以及 OOD 設計圖：@OOD.md
+- 兩張圖中所指示的類別屬性及操作只是基準，你可視情況增加新的類別、屬性或行為
+- 中國象棋規則請參考 @chinese-chess.feature 中的詳細說明
+
+## Tech Stack
+1. Language: Python 3.11
+2. BDD Test framework: Behave
+3. Code formatter: Black (line-length=79)
+
+## Application Environment
+1. App 類型：純模組程式碼
+2. 此 feature file 中的所有象棋規則邏輯存放至對應的類別中
+3. Source code root: src/
+4. Test code root: features/
+
+## Project Structure
+```
+chinese-chess/
+├── src/
+│   └── chess/
+│       ├── entities/
+│       │   ├── board.py
+│       │   ├── piece.py
+│       │   ├── position.py
+│       │   └── move.py
+│       ├── pieces/              # 各種棋子的實作
+│       │   ├── general.py
+│       │   ├── guard.py
+│       │   ├── rook.py
+│       │   ├── horse.py
+│       │   ├── cannon.py
+│       │   ├── elephant.py
+│       │   └── soldier.py
+│       └── game/
+│           └── game_service.py
+├── features/
+│   ├── chinese-chess.feature
+│   ├── environment.py
+│   └── steps/
+│       └── chess_steps.py
+└── tasks/
+    ├── BDD.prompt
+    ├── chinese-chess.feature
+    ├── ERD.md
+    └── OOD.md
+```
+
+# BDD 開發流程
+
+1. 先建置出 Behave walking skeleton - 可順利運行 Behave 以及至少一個 scenario，確認至少有一個 test case 被測試框架執行到。
+
+2. 嚴格遵守 BDD 以及最小增量原則來開發所有程式碼，針對所有 scenario，一次開發一個 scenario，依序進行：
+    A. 一次選擇一個 scenario 實作，除此 scenario 之外的測試全部都 @skip。撰寫此 scenario 對應的 Steps (given, when, then)、開啟相關類別，但是每個類別的行為都不實作，並且執行測試，確認測試失敗 (test fail)，並且測試失敗的原因並非框架層級的錯誤，而是期望的「值」上的錯誤。嚴格確認這步驟完成後才能進行下一步的實作。
+    B. 為了通過上一步所撰寫的測試程式碼，請實作相關類別所需的程式碼，並確認能讓所有的測試程式碼都通過。請嚴格確認有執行到測試程式碼，從 test report 中覆述一次目前 test passed 的數量。
+    C. 遵守 clean code 原則，思考是否要重構每個類別的內部程式碼，如果必要重構的話，在重構完成之後，再執行一次測試，確保所有測試仍然通過，否則需修正邏輯直到測試全數通過。
+
+# Chinese Chess Rules Summary
+
+## Board
+- 9 columns × 10 rows
+- Red starts from row 1-5, Black from row 6-10
+- River (楚河漢界) between row 5 and row 6
+- Palace (九宮) for Generals and Guards: rows 1-3 for Red, rows 8-10 for Black, columns 4-6
+
+## Pieces and Movement Rules
+
+1. **General (將/帥)**: Moves one step orthogonally within palace, cannot face opponent's General directly
+2. **Guard (士/仕)**: Moves one step diagonally within palace
+3. **Rook (車)**: Moves any distance orthogonally, cannot jump over pieces
+4. **Horse (馬/傌)**: Moves in "L" shape (2+1), can be blocked by adjacent piece
+5. **Cannon (炮)**: Moves like Rook, but must jump exactly one piece to capture
+6. **Elephant (相/象)**: Moves 2 steps diagonally, cannot cross river, can be blocked at midpoint
+7. **Soldier (兵/卒)**: Moves forward before crossing river, can move sideways after crossing, cannot move backward
+
+## Win Condition
+- Capture opponent's General to win immediately
